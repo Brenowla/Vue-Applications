@@ -2,10 +2,10 @@
   <div class="chat-area">
     <div class="image full-width full-height">
       <Message
-        v-for="item in 10"
-        :key="item"
-        :text="'Nova mensagem'"
-        :hour="'12:05'"
+        v-for="item in messages"
+        :key="item.id"
+        :text="item.text"
+        :hour="item.hour"
         :my="true"
       ></Message>
     </div>
@@ -13,14 +13,43 @@
 </template>
 
 <script>
+import api from "../../services/api";
 import Message from "../../components/Message/Index";
+import { notify } from "../../utils";
 export default {
   name: "ChatArea",
+  props: ["currentUser", "newMessages"],
   data() {
-    return {};
+    return {
+      messages: [],
+      myId: localStorage.getItem("myId"),
+    };
   },
   components: {
     Message,
+  },
+  async mounted() {
+    await this.getMessages();
+  },
+  watch: {
+    currentUser() {
+      this.getMessages();
+    },
+    newMessages() {},
+  },
+  methods: {
+    async getMessages() {
+      console.log(this.currentUser);
+      console.log(this.myId);
+      await api
+        .get(`messages/${this.currentUser}/${this.myId}`)
+        .then((response) => {
+          this.messages = response.data;
+        })
+        .catch(() => {
+          notify("negative", "Falha ao listar mensagens!");
+        });
+    },
   },
 };
 </script>

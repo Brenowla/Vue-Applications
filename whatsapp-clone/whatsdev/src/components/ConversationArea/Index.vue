@@ -4,8 +4,9 @@
     <div class="card-area">
       <div
         class="card row items-center justify-between q-px-md"
-        v-for="item in 30"
-        :key="item"
+        v-for="item in currentUsers"
+        :key="item.id"
+        @click="seeConversation(item.id, item.email)"
       >
         <q-avatar size="40px" class="q-mr-sm">
           <img src="http://i.pravatar.cc/40" />
@@ -13,8 +14,8 @@
         <div class="message column justify-around full-height q-pt-sm">
           <div class="row justify-between">
             <div class="column">
-              <span>Marcelo Vale</span>
-              <span v-if="1 == 1">Nova mensagem recebida</span>
+              <span>{{ item.name }}</span>
+              <span v-if="item.newMessage">Nova mensagem recebida</span>
               <span v-else>Veja nossa última conversa</span>
             </div>
             <div class="column itens-center justify-center">
@@ -31,6 +32,25 @@
 <script>
 import Header from "./components/Header";
 export default {
+  props: ["users"],
+  data() {
+    return {
+      currentUsers: [],
+    };
+  },
+  watch: {
+    users() {
+      this.currentUsers = this.users;
+    },
+  },
+  mounted() {
+    this.currentUsers = this.users;
+  },
+  methods: {
+    seeConversation(id, email) {
+      this.$emit("selectedItem", { id, email });
+    },
+  },
   name: "ConversationArea",
   components: {
     Header,

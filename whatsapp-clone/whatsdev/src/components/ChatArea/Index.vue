@@ -6,7 +6,7 @@
         :key="item.id"
         :text="item.text"
         :hour="item.hour"
-        :my="true"
+        :my="my(item.userId)"
       ></Message>
     </div>
   </div>
@@ -32,10 +32,13 @@ export default {
     await this.getMessages();
   },
   watch: {
-    currentUser() {
-      this.getMessages();
+    async currentUser() {
+      this.messages = [];
+      await this.getMessages();
     },
-    newMessages() {},
+    async newMessages() {
+      await this.getMessages();
+    },
   },
   methods: {
     async getMessages() {
@@ -49,6 +52,9 @@ export default {
         .catch(() => {
           notify("negative", "Falha ao listar mensagens!");
         });
+    },
+    my(messageUserId) {
+      return this.myId === messageUserId.toString();
     },
   },
 };

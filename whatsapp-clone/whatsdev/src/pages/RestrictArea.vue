@@ -9,7 +9,10 @@
         :currentUser="selectedItem"
         :newMessages="newMessages"
       ></Chat-Area>
-      <MessageBar></MessageBar>
+      <MessageBar
+        :currentUser="selectedItem"
+        @reload="reloadMessages"
+      ></MessageBar>
     </div>
     <Empty v-else />
   </q-page>
@@ -33,6 +36,7 @@ export default {
       newMessages: "",
       selectedItem: null,
       nameConversation: "",
+      myId: localStorage.getItem("myId"),
     };
   },
   components: {
@@ -54,6 +58,9 @@ export default {
           this.nameConversation = "Novo usuário";
         });
     },
+    reloadMessages({ messageId }) {
+      this.newMessages = messageId;
+    },
   },
   created() {
     const receiver = localStorage.getItem("receiver");
@@ -73,7 +80,14 @@ export default {
     await api
       .get("users")
       .then((response) => {
-        this.users = response.data;
+        const allUsers = [];
+        for (const item of response.data) {
+          console.log(item.id.toString());
+          if (item.id.toString() !== this.myId) {
+            allUsers.push(item);
+          }
+        }
+        this.users = allUsers;
       })
       .catch(() => {
         notify("negative", "Falha ao listar usuários");
